@@ -1,0 +1,97 @@
+import asyncio
+from telethon import TelegramClient, events
+from telethon.errors import SessionPasswordNeededError
+from datetime import datetime
+import random
+
+# إعدادات حساب تليجرام
+api_id = 18439801
+api_hash = '404b3d2a988df2f79939ea0ce63eaad0'
+session_name = 'session_name'
+
+# إعداد القنوات
+source_channel = 'https://t.me/+uEZERfS4hJoxYjA0'  # قناة التوصيات
+target_channel = '@COPY_SIGN11'  # قناتك الخاصة
+
+# الصورة الثابتة المرفقة مع كل توصية
+image_path = 'photo.jpg'
+
+# تهيئة العميل
+client = TelegramClient(session_name, api_id, api_hash)
+
+# معالجة التوصيات
+async def forward_message(event):
+    message = event.raw_text
+
+    if "put" in message.lower() or "call" in message.lower():
+        try:
+            lines = message.splitlines()
+
+            pair = lines[0].replace("💳", "").strip()
+            raw_time_24 = lines[2].replace("⌛", "").strip()
+            raw_direction = lines[3].lower()
+
+            if "put" in raw_direction:
+                direction = "Down"
+            elif "call" in raw_direction:
+                direction = "Up"
+            else:
+                direction = "غير معروف"
+
+            random_profit = f"{random.randint(90, 99)}%"
+
+            formatted_message = f"""
+📉 اسم الــزوج  : {pair}
+🎯 توقيـــت الدخــول : {raw_time_24}
+↕️ اتجــاه الصفقــــه : {direction}
+🕒 مــده الصفقـــه : 2MIN
+
+• نسبه الربح المتوقعة {random_profit} ❇️
+• للتواصل معي @ALPASHMO7ASB ⚡️
+            """.strip()
+
+            await client.send_file(
+                target_channel,
+                file=image_path,
+                caption=formatted_message
+            )
+            print(f"✅ تم إرسال توصية: {pair} - {direction} - {raw_time_24} - {random_profit}")
+        except Exception as e:
+            print("❌ خطأ أثناء تنسيق أو إرسال التوصية:", e)
+
+    elif "win" in message.lower():
+        try:
+            await client.send_message(target_channel, "📊 نتيجه الصفقه :\n✅ انتهـت الصـفقه بــربح ✅")
+            with open("results.txt", "a", encoding="utf-8") as file:
+                file.write("WIN ✅ - " + str(datetime.now()) + "\n")
+        except Exception as e:
+            print("❌ خطأ في إرسال نتيجة WIN:", e)
+
+    elif "loss" in message.lower():
+        try:
+            await client.send_message(target_channel, "📊 نتيجه الصفقه :\n❎ انتهـت الصـفقه بخســـاره ❎")
+            with open("results.txt", "a", encoding="utf-8") as file:
+                file.write("LOSS ❎ - " + str(datetime.now()) + "\n")
+        except Exception as e:
+            print("❌ خطأ في إرسال نتيجة LOSS:", e)
+
+# بدء البوت
+async def main():
+    await client.start()
+    print("🚀 البوت يعمل الآن على مدار الساعة...")
+
+    if not await client.is_user_authorized():
+        await client.send_code_request(input("📱 أدخل رقم هاتفك: "))
+        try:
+            await client.sign_in(code=input("📩 أدخل كود التسجيل: "))
+        except SessionPasswordNeededError:
+            await client.sign_in(password=input("🔐 أدخل كلمة المرور (2FA): "))
+
+    @client.on(events.NewMessage(chats=source_channel))
+    async def handler(event):
+        await forward_message(event)
+
+    await client.run_until_disconnected()
+
+if __name__ == '__main__':
+    asyncio.run(main())
