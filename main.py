@@ -7,12 +7,12 @@ from telegram.ext import (
     MessageHandler, filters, CommandHandler
 )
 
+# بيانات البوت والقنوات
 BOT_TOKEN = '8053107448:AAHs_Kb3m2_RGgJ9EDgNe-0375TSJMoP4Gs'
-SOURCE_CHANNEL_ID = -1002516462566  # معرف القناة المصدر
-TARGET_CHANNEL_ID = -1002805490166  # معرف القناة الهدف
+SOURCE_CHANNEL_ID = -1002516462566  # معرف القناة المصدر (العامة)
+TARGET_CHANNEL_ID = -1002805490166  # معرف القناة الهدف (الخاصة)
 IMAGE_PATH = 'photo.jpg'
-
-WEBHOOK_URL = 'https://telegram_robot.up.railway.app'  # عدله حسب استضافة مشروعك
+WEBHOOK_URL = 'https://telegram_robot.up.railway.app'  # رابط مشروعك على Railway
 
 # تنسيق الرسالة
 def format_message(text):
@@ -76,7 +76,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # تشغيل البوت
 if __name__ == '__main__':
-    app = ApplicationBuilder().token(BOT_TOKEN).webhook_url(WEBHOOK_URL).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # الأمر /start
     app.add_handler(CommandHandler("start", start))
