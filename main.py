@@ -7,12 +7,12 @@ from telegram.ext import (
     MessageHandler, filters, CommandHandler
 )
 
-# بيانات البوت والقنوات
 BOT_TOKEN = '8053107448:AAHs_Kb3m2_RGgJ9EDgNe-0375TSJMoP4Gs'
-SOURCE_CHANNEL_ID = -1002516462566  # معرف القناة المصدر (العامة)
-TARGET_CHANNEL_ID = -1002805490166  # معرف القناة الهدف (الخاصة)
+SOURCE_CHANNEL_ID = -1002516462566  # معرف القناة المصدر
+TARGET_CHANNEL_ID = -1002805490166  # معرف القناة الهدف
 IMAGE_PATH = 'photo.jpg'
-WEBHOOK_URL = 'https://telegram_robot.up.railway.app'  # رابط مشروعك على Railway
+
+WEBHOOK_URL = 'https://telegram_robot.up.railway.app'
 
 # تنسيق الرسالة
 def format_message(text):
@@ -49,6 +49,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not message or not message.text:
         return
 
+    print("📥 رسالة مستلمة من القناة المصدر:")
+    print(message.text)  # عرض محتوى الرسالة في اللوج
+
     text = message.text.lower()
     formatted = format_message(message.text)
 
@@ -78,10 +81,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == '__main__':
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # الأمر /start
     app.add_handler(CommandHandler("start", start))
-
-    # استقبال الرسائل من القناة المصدر
     app.add_handler(MessageHandler(filters.Chat(SOURCE_CHANNEL_ID) & filters.TEXT, handle_message))
 
     print("🚀 البوت يعمل الآن باستخدام Webhook...")
