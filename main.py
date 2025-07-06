@@ -1,45 +1,41 @@
-import asyncio
-from telethon import TelegramClient, events
+import logging
+from telegram import Bot, Update, InputFile
+from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 from datetime import datetime
 import random
+import os
 
-# إعدادات حساب تليجرام
-api_id = 18439801
-api_hash = '404b3d2a988df2f79939ea0ce63eaad0'
-session_name = 'session_name'  # بدون .session
+# إعداد البوت
+BOT_TOKEN = '7251454282:AAFTpC8ZY0YQ31S-UcSYRYPHT0w40Bz9Srs'
 
-# إعداد القنوات
-source_channel = 'https://t.me/gold_trade1001'  # قناة التوصيات
-target_channel = 'https://t.me/robot_trade_AL'  # قناتك الخاصة
+# معرف القنوات (استخدم @username أو ID)
+SOURCE_CHANNEL_ID = -1002516462566   # ID أو @username للقناة المصدر
+TARGET_CHANNEL_ID = -1002805490166   # ID أو @username للقناة الهدف
 
-# الصورة الثابتة المرفقة مع كل توصية
-image_path = 'photo.jpg'
+# الصورة الثابتة
+IMAGE_PATH = 'photo.jpg'
 
-# تهيئة العميل
-client = TelegramClient(session_name, api_id, api_hash)
+# إعداد اللوجات
+logging.basicConfig(level=logging.INFO)
 
-# معالجة التوصيات
-async def forward_message(event):
-    message = event.raw_text
+# تنسيق الرسائل
+def format_message(message_text: str) -> str:
+    lines = message_text.splitlines()
+    try:
+        pair = lines[0].replace("💳", "").strip()
+        raw_time_24 = lines[2].replace("⌛", "").strip()
+        raw_direction = lines[3].lower()
 
-    if "put" in message.lower() or "call" in message.lower():
-        try:
-            lines = message.splitlines()
+        if "put" in raw_direction:
+            direction = "Down"
+        elif "call" in raw_direction:
+            direction = "Up"
+        else:
+            direction = "غير معروف"
 
-            pair = lines[0].replace("💳", "").strip()
-            raw_time_24 = lines[2].replace("⌛", "").strip()
-            raw_direction = lines[3].lower()
+        random_profit = f"{random.randint(90, 99)}%"
 
-            if "put" in raw_direction:
-                direction = "Down"
-            elif "call" in raw_direction:
-                direction = "Up"
-            else:
-                direction = "غير معروف"
-
-            random_profit = f"{random.randint(90, 99)}%"
-
-            formatted_message = f"""
+        return f"""
 📉 اسم الــزوج  : {pair}
 🎯 توقيـــت الدخــول : {raw_time_24}
 ↕️ اتجــاه الصفقــــه : {direction}
@@ -47,43 +43,48 @@ async def forward_message(event):
 
 • نسبه الربح المتوقعة {random_profit} ❇️
 • للتواصل معي @ALPASHMO7ASB ⚡️
-            """.strip()
+        """.strip()
+    except Exception as e:
+        logging.error(f"❌ خطأ أثناء تنسيق الرسالة: {e}")
+        return None
 
-            await client.send_file(
-                target_channel,
-                file=image_path,
-                caption=formatted_message
+# وظيفة التعامل مع الرسائل
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.message
+    if not message or not message.text:
+        return
+
+    text = message.text.lower()
+
+    if "put" in text or "call" in text:
+        formatted = format_message(message.text)
+        if formatted:
+            await context.bot.send_photo(
+                chat_id=TARGET_CHANNEL_ID,
+                photo=InputFile(IMAGE_PATH),
+                caption=formatted
             )
-            print(f"✅ تم إرسال توصية: {pair} - {direction} - {raw_time_24} - {random_profit}")
-        except Exception as e:
-            print("❌ خطأ أثناء تنسيق أو إرسال التوصية:", e)
+            logging.info("✅ تم إرسال توصية.")
 
-    elif "win" in message.lower():
-        try:
-            await client.send_message(target_channel, "📊 نتيجه الصفقه :\n✅ انتهـت الصـفقه بــربح ✅")
-            with open("results.txt", "a", encoding="utf-8") as file:
-                file.write("WIN ✅ - " + str(datetime.now()) + "\n")
-        except Exception as e:
-            print("❌ خطأ في إرسال نتيجة WIN:", e)
+    elif "win" in text:
+        await context.bot.send_message(
+            chat_id=TARGET_CHANNEL_ID,
+            text="📊 نتيجه الصفقه :\n✅ انتهـت الصـفقه بــربح ✅"
+        )
+        with open("results.txt", "a", encoding="utf-8") as file:
+            file.write("WIN ✅ - " + str(datetime.now()) + "\n")
 
-    elif "loss" in message.lower():
-        try:
-            await client.send_message(target_channel, "📊 نتيجه الصفقه :\n❎ انتهـت الصـفقه بخســـاره ❎")
-            with open("results.txt", "a", encoding="utf-8") as file:
-                file.write("LOSS ❎ - " + str(datetime.now()) + "\n")
-        except Exception as e:
-            print("❌ خطأ في إرسال نتيجة LOSS:", e)
+    elif "loss" in text:
+        await context.bot.send_message(
+            chat_id=TARGET_CHANNEL_ID,
+            text="📊 نتيجه الصفقه :\n❎ انتهـت الصـفقه بخســـاره ❎"
+        )
+        with open("results.txt", "a", encoding="utf-8") as file:
+            file.write("LOSS ❎ - " + str(datetime.now()) + "\n")
 
-# بدء البوت
-async def main():
-    await client.start()
-    print("🚀 البوت يعمل الآن على مدار الساعة...")
-
-    @client.on(events.NewMessage(chats=source_channel))
-    async def handler(event):
-        await forward_message(event)
-
-    await client.run_until_disconnected()
-
+# تشغيل البوت
 if __name__ == '__main__':
-    asyncio.run(main())
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(MessageHandler(filters.Chat(SOURCE_CHANNEL_ID) & filters.TEXT, handle_message))
+    print("🚀 البوت يعمل الآن على مدار الساعة باستخدام Bot Token...")
+    app.run_polling()
