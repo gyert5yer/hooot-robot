@@ -1,13 +1,12 @@
 import asyncio
 from telethon import TelegramClient, events
-from telethon.errors import SessionPasswordNeededError
 from datetime import datetime
 import random
 
 # إعدادات حساب تليجرام
 api_id = 18439801
 api_hash = '404b3d2a988df2f79939ea0ce63eaad0'
-session_name = 'session_name'
+session_name = 'session_name'  # بدون .session
 
 # إعداد القنوات
 source_channel = 'https://t.me/+uEZERfS4hJoxYjA0'  # قناة التوصيات
@@ -79,13 +78,6 @@ async def forward_message(event):
 async def main():
     await client.start()
     print("🚀 البوت يعمل الآن على مدار الساعة...")
-
-    if not await client.is_user_authorized():
-        await client.send_code_request(input("📱 أدخل رقم هاتفك: "))
-        try:
-            await client.sign_in(code=input("📩 أدخل كود التسجيل: "))
-        except SessionPasswordNeededError:
-            await client.sign_in(password=input("🔐 أدخل كلمة المرور (2FA): "))
 
     @client.on(events.NewMessage(chats=source_channel))
     async def handler(event):
