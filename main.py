@@ -10,7 +10,7 @@ session_name = 'session_name'  # بدون .session
 
 # إعداد القنوات
 source_channel = 'https://t.me/+uEZERfS4hJoxYjA0'  # قناة التوصيات
-target_channel = 'https://t.me/+D6gerN64yp8wMjQ8'  # قناتك الخاصة
+target_channel = 'https://t.me/robot_trade_AL'  # قناتك الخاصة
 
 # الصورة الثابتة المرفقة مع كل توصية
 image_path = 'photo.jpg'
