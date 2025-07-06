@@ -9,7 +9,7 @@ api_hash = '404b3d2a988df2f79939ea0ce63eaad0'
 session_name = 'session_name'  # بدون .session
 
 # إعداد القنوات
-source_channel = 'https://t.me/+uEZERfS4hJoxYjA0'  # قناة التوصيات
+source_channel = 'https://t.me/gold_trade1001'  # قناة التوصيات
 target_channel = 'https://t.me/robot_trade_AL'  # قناتك الخاصة
 
 # الصورة الثابتة المرفقة مع كل توصية
