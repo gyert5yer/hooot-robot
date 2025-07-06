@@ -6,7 +6,7 @@ import random
 import os
 
 # إعداد البوت
-BOT_TOKEN = '7251454282:AAFTpC8ZY0YQ31S-UcSYRYPHT0w40Bz9Srs'
+BOT_TOKEN = '8053107448:AAHs_Kb3m2_RGgJ9EDgNe-0375TSJMoP4Gs'
 
 # معرف القنوات (استخدم @username أو ID)
 SOURCE_CHANNEL_ID = -1002516462566   # ID أو @username للقناة المصدر
