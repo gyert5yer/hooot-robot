@@ -11,7 +11,7 @@ session_name = 'session_name'
 
 # إعداد القنوات
 source_channel = 'https://t.me/+uEZERfS4hJoxYjA0'  # قناة التوصيات
-target_channel = '@COPY_SIGN11'  # قناتك الخاصة
+target_channel = 'https://t.me/+D6gerN64yp8wMjQ8'  # قناتك الخاصة
 
 # الصورة الثابتة المرفقة مع كل توصية
 image_path = 'photo.jpg'
